@@ -1,34 +1,31 @@
 import { useState } from 'react';
 import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import axios from 'axios';
 
 interface Imagem{
   id: string,
   url: string
 }
 
+
+
 export default function App() {
   const [listaImagens, setListaImagens] = useState<Imagem[]>([])
 
-  const ExibirImagens = () => {
-    const ListaFixa: Imagem[] = [
-    { id: '1',
-     url:'https://cdn2.thecatapi.com/images/4pv.gif'},
-     {id: '2',
-     url:'https://cdn2.thecatapi.com/images/be6.gif'},
-     {id: '3',
-     url:'https://cdn2.thecatapi.com/images/bte.jpg'},
-    { id: '4',
-     url:'https://cdn2.thecatapi.com/images/dlh.jpg'},
-    { id: '5',
-     url:'https://cdn2.thecatapi.com/images/e3f.jpg'}
-  ];
-    setListaImagens(ListaFixa)
+  const BuscarImagens = () => {
+    axios.get('https://api.thecatapi.com/v1/images/search?limit=10')
+    .then(res => {
+      setListaImagens(res.data.slice(0,5))
+    })
+    .catch(err => {
+      console.log(err)
+    })
   }
 
   return (
     <View style={styles.container}>
-    <Pressable style={styles.botoes} onPress={ExibirImagens}>
-      <Text style={styles.textoBotoes} > Aperte Para Exibir gatinhos </Text>
+    <Pressable style={styles.botoes} onPress={BuscarImagens}>
+      <Text style={styles.textoBotoes} > Aperte para exibir gatinhos </Text>
     </Pressable>
       <FlatList
         keyExtractor={ item => (item.id)!}
