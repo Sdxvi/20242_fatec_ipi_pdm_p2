@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
+
 
 interface Imagem{
   id: string,
@@ -45,46 +46,55 @@ export default function App() {
 
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Pressable style={styles.botoes} onPress={BuscarImagens}>
-          <Text style={styles.textoBotoes} > Aperte para exibir fotos de gatos </Text>
-        </Pressable>
-          <FlatList
-          style={styles.listaGatos}
-            keyExtractor={ item => (item.id)!}
-            data={listaImagens}
-            renderItem={img => (
-              <View style={styles.container}>
-                <Pressable style={styles.favoritar} onPress={() => FavoritarImagem(img.item.id)}>
-                  <Text> Favoritar Imagem: </Text>
-                  <Ionicons name={img.item.fav ? "paw" : "paw-outline"} size={24} color="yellow" />
-                </Pressable>
-                <Image style={styles.imagens} source={{uri: img.item.url}}/> 
+      <ScrollView>
+        <View style={styles.container}>
+          <Image source={require('./assets/topoGato.png')}/>
+          <Pressable style={styles.botoes} onPress={BuscarImagens}>
+            <Text style={styles.botoesText} > Aperte para exibir fotos de gatos </Text>
+          </Pressable>
+            <FlatList
+              keyExtractor={ item => (item.id)!}
+              data={listaImagens}
+              renderItem={img => (
+                <View style={styles.container}>
+                  <Pressable style={styles.favoritar} onPress={() => FavoritarImagem(img.item.id)}>
+                    <Text style={styles.textos}> Favoritar Imagem: </Text>
+                    <Ionicons name={img.item.fav ? "paw" : "paw-outline"} size={24} color="yellow" />
+                  </Pressable>
+                  <ImageBackground style={styles.imagens} source={{uri: img.item.url}}>
+                    <Image style={styles.moldura} source={require('./assets/gatinhosMoldura.png')}  resizeMode="cover"/> 
+                  </ImageBackground>
+                </View>
+                )  
+              }
+            />
+            { listaFavoritos.length > 0?
+              <View style={{alignItems: 'center', justifyContent: 'center'}}>   
+                <View style={styles.favoritar}>
+                  <Text style={styles.titulo} > Lista de Favoritos </Text>
+                  <Image source={require('./assets/gatoFavoritos.png')}/>
+                </View>
+                <FlatList
+                  keyExtractor={ item => (item.id)!}
+                  style={styles.listaFavoritos}
+                  data={listaFavoritos}
+                  renderItem={img => (
+                    <View style={styles.container}>
+                      <Pressable style={styles.favoritar} onPress={() => RemoverFavorito(img.item.id)}>
+                        <Text style={styles.textos}> Remover dos Favoritos: </Text>
+                        <Ionicons name="trash-outline" size={24} color="red" />
+                      </Pressable>
+                      <Image style={styles.imagens} source={{uri: img.item.url}}/> 
+                    </View>
+                    )  
+                  }
+                />
               </View>
-              )  
+              :
+              <Text style={styles.textos}>Ao favoritar uma imagem, sua lista de favoritos será gerada aqui!</Text>
             }
-          />
-          <Text style={styles.titulo} > Lista de Favoritos </Text>
-          <FlatList
-            keyExtractor={ item => (item.id)!}
-            style={styles.listaFavoritos}
-            data={listaFavoritos}
-            ListEmptyComponent={
-              <Text>Que pena, parece que sua Lista de Favoritos está vazia...</Text>
-            }
-            renderItem={img => (
-              <View style={styles.container}>
-                <Pressable style={styles.favoritar} onPress={() => RemoverFavorito(img.item.id)}>
-                  <Text> Remover dos Favoritos: </Text>
-                  <Ionicons name="trash-outline" size={24} color="red" />
-                </Pressable>
-                <Image style={styles.imagens} source={{uri: img.item.url}}/> 
-              </View>
-              )  
-            }
-          />
-      </View>
+              
+        </View>
     </ScrollView>
   );
 }
@@ -92,39 +102,57 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 4
   },
   botoes: {
-    width: '50%', 
+    width: 370, 
     backgroundColor: 'black', 
     padding: 12, 
-    borderRadius: 4,
-    marginBottom: 8
+    borderRadius: 10,
+    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: -1, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    borderWidth: 2,
+    borderColor: 'gray',
   },
-  textoBotoes: {
+  botoesText: {
     color: 'white',
-    textAlign: 'center'
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  moldura:{
+    width:350,
+    height:350
   },
   imagens: {
     width: 350,
-    height: 350
-  },
-  listaGatos: {
-    borderColor: 'black',
-    borderWidth: 1,
-    borderRadius: 5
+    height: 350,
+    marginBottom: 5
   },
   listaFavoritos: {
     borderColor: 'black',
     borderWidth: 1,
     borderRadius: 5
   },
-  titulo:{
+  textos:{
+    fontFamily: 'cursive',
+    textAlign: 'center'
+  },
+  titulo: {
+    fontFamily: 'Roboto',
+    fontSize: 24,
+    fontWeight: 'bold',
     borderColor: 'black',
-    fontSize: 20
+    textAlign: 'center',
+    marginTop:20,
+    marginBottom: 10,
   },
   favoritar: {
     flexDirection: 'row'
